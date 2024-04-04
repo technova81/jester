@@ -1,0 +1,8 @@
+[package]
+name = "athena-bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serenity = "0.12.1"
+tokio = { version = "1.37.0", features = ["full"] }
