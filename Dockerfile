@@ -1,9 +1,9 @@
-FROM rust:alpine AS builder
+FROM rust:slim-buster AS builder
 
 WORKDIR /app
 COPY . .
 RUN cargo build -r
-RUN cp ./target/release/athena-bot /
+RUN cp ./target/release/jester /
 
 FROM alpine:latest AS final
 
@@ -15,13 +15,10 @@ RUN adduser \
     --no-create-home \
     --uid "10001" \
     appuser
-COPY --from=builder /athena-bot /usr/local/bin
+COPY --from=builder /jester /usr/local/bin
 
-RUN chown appuser /usr/local/bin/athena-bot
-COPY --from=builder /app/config /opt/athena-bot/config
-
-RUN chown -R appuser /opt/athena-bot
+RUN chown appuser /usr/local/bin/jester
 USER appuser
 
-WORKDIR /opt/athena-bot
-ENTRYPOINT ["athena-bot"]
+WORKDIR /jester
+ENTRYPOINT ["jester"]
