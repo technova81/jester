@@ -22,7 +22,7 @@ func (cmd *PurgeCmd) FromArgs(args []string) error {
 		return nil
 	}
 
-	return errors.New("invalid command \n Usage: !purge <limit>")
+	return errors.New("invalid args")
 }
 
 func (cmd *PurgeCmd) Name() string { return "purge" }
@@ -33,7 +33,7 @@ func (cmd *PurgeCmd) LongHelp() LongHelp {
 		Usage: "`!purge <limit>`",
 		Arguments: []Argument{
 			{
-				Name:     "Limit",
+				Name:     "limit",
 				Required: true,
 				Help:     "An integer specifying the number of messages to delete (up to a maximum limit 100).",
 			},
@@ -64,7 +64,6 @@ func (cmd *PurgeCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error 
 	}
 
 	return nil
-
 }
 
 func (cmd *PurgeCmd) Subcommands() map[string]Command {

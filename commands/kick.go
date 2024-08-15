@@ -14,8 +14,8 @@ type KickCmd struct {
 }
 
 func (cmd *KickCmd) FromArgs(args []string) error {
-	if len(args) < 2 {
-		return errors.New("invalid args \n Usage: !kick @user [reason]")
+	if len(args) != 2 {
+		return errors.New("invalid args")
 	}
 
 	cmd.UserID = args[0][2 : len(args[0])-1]
@@ -26,16 +26,9 @@ func (cmd *KickCmd) FromArgs(args []string) error {
 func (cmd *KickCmd) Name() string { return "kick" }
 func (cmd *KickCmd) Help() string { return "Kick a given user" }
 func (cmd *KickCmd) LongHelp() LongHelp {
-	// 	return `This command kicks a user from the server, preventing them from rejoining.
-	// 		**Usage:**` + "`!kick @user [reason]`" +
-	// 		`**Arguments:**
-	// 		* @user (Required): Mention the user to kick using the "@" symbol followed by their username.
-	// 		* [days] (Required): Specify the duration of the kick in days.
-	// 		* [reason] (Required): Provide a reason for the kick. The reason will be DM to user.`
-
 	return LongHelp{
 		About: "This command kicks a user from the server.",
-		Usage: "`!kick @user [reason]`",
+		Usage: "`!kick <user> <reason>`",
 		Arguments: []Argument{
 			{
 				Name:     "user",
@@ -53,9 +46,7 @@ func (cmd *KickCmd) LongHelp() LongHelp {
 }
 
 func (cmd *KickCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
-
 	err := sess.GuildMemberDeleteWithReason(msg.GuildID, cmd.UserID, cmd.Reason)
-
 	if err != nil {
 		return err
 	}

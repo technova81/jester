@@ -34,6 +34,7 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if err := cmd.FromArgs(args[1:]); err != nil {
 		s.ChannelMessageSend(m.ChannelID, err.Error())
+		s.ChannelMessageSend(m.ChannelID, cmd.LongHelp().Usage)
 		return
 	}
 

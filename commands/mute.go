@@ -16,21 +16,15 @@ func (cmd *MuteCmd) FromArgs(args []string) error {
 		return nil
 	}
 
-	return errors.New("invalid command \n Usage: !mute @user")
+	return errors.New("invalid args")
 }
 
 func (cmd *MuteCmd) Name() string { return "mute" }
 func (cmd *MuteCmd) Help() string { return "Mute a given user" }
 func (cmd *MuteCmd) LongHelp() LongHelp {
-	// return `This command mutes a user on the server, depending on the context.
-	// 	**Usage:**` + "`!mute @user`" +
-	// 	`**Arguments:**
-	// 	* @user (Required): Mention the user to unmute using the "@" symbol followed by their username.
-	// 	**Note:User must be connect to a voice channel**`
-
 	return LongHelp{
 		About: "This command mutes a user on the server",
-		Usage: "`!mute @user`",
+		Usage: "`!mute <user>`",
 		Arguments: []Argument{
 			{
 				Name:     "user",

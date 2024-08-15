@@ -21,13 +21,12 @@ func (cmd *HelpCmd) Help() string { return "Displays command usage details." }
 func (cmd *HelpCmd) LongHelp() LongHelp {
 	return LongHelp{
 		About:       "Provides detailed information on how to use the available commands.",
-		Usage:       "`!help <commandName>` or `!help`",
+		Usage:       "`!help [...commands]`",
 		Arguments:   nil,
 		Subcommands: nil,
 	}
 }
 func (cmd *HelpCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
-
 	if len(cmd.args) == 0 {
 		embed := &discordgo.MessageEmbed{
 			Title:       "Available Commands:",
@@ -45,34 +44,21 @@ func (cmd *HelpCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
 		_, err := sess.ChannelMessageSendEmbed(msg.ChannelID, embed)
 		return err
 	} else {
-		// case 1:
-		// 	{
-		// 		embed := &discordgo.MessageEmbed{
-		// 			Title:       args[0],
-		// 			Description: Commands[args[0]].Help(),
-		// 			Fields: []*discordgo.MessageEmbedField{
-		// 				{
-		// 					Name:  "About",
-		// 					Value: Commands[args[0]].LongHelp(),
-		// 				},
-		// 			},
-		// 		}
-		// 		_, err := sess.ChannelMessageSendEmbed(msg.ChannelID, embed)
-		// 		return err
-		// 	}
+		currCmd, ok := Commands[cmd.args[0]]
+		if !ok {
+			return errors.New("invalid args")
+		}
 
-		// default:
-		// 	return errors.New("invalid command format \n Usage: !help or !help <commandName>")
-
-		var currCmd Command = Commands[cmd.args[0]]
 		for i := 1; i < len(cmd.args); i++ {
 			if subCmds := currCmd.Subcommands(); subCmds != nil {
-				currCmd = subCmds[cmd.args[i]]
+				if currCmd, ok = subCmds[cmd.args[i]]; !ok {
+					return errors.New("invalid subcommand")
+				}
 			} else {
 				return errors.New("invalid subcommand")
 			}
-
 		}
+
 		longHelp := currCmd.LongHelp()
 		fields := []*discordgo.MessageEmbedField{
 			{
@@ -97,12 +83,17 @@ func (cmd *HelpCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
 			})
 		}
 
-		// if longHelp.Subcommands != nil {
-		// 	fields = append(fields, &discordgo.MessageEmbedField{
-		// 		Name:  "Subcommands",
-		// 		Value: *longHelp.Subcommands,
-		// 	})
-		// }
+		if longHelp.Subcommands != nil && len(longHelp.Subcommands) > 0 {
+			subcommands := ""
+			for _, subcommand := range longHelp.Subcommands {
+				command := fmt.Sprintf("* `%s`\n", subcommand)
+				subcommands += command
+			}
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:  "Subcommand",
+				Value: subcommands,
+			})
+		}
 
 		embed := &discordgo.MessageEmbed{
 			Title:       currCmd.Name(),

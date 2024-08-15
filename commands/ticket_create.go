@@ -18,14 +18,23 @@ func (cmd *TicketCreateCmd) FromArgs(args []string) error {
 
 func (cmd *TicketCreateCmd) Name() string { return "ticket:create" }
 func (cmd *TicketCreateCmd) Help() string {
-	return "Deletes a specified number of messages in the channel."
+	return "Creates a new ticket."
 }
-func (cmd *TicketCreateCmd) LongHelp() string {
-	return `This command deletes a specified number of messages from the current text channel.
-		**Usage:**` + "`!purge <limit>`" +
-		`**Arguments:**
-		* <limit> (Required): An integer specifying the number of messages to delete (up to a maximum limit 100).`
+func (cmd *TicketCreateCmd) LongHelp() LongHelp {
+	return LongHelp{
+		About: "This command is used for creating ticket",
+		Usage: "`!ticket create <messsage>`",
+		Arguments: []Argument{
+			{
+				Name:     "message",
+				Required: true,
+				Help:     "Reason to create a ticket.",
+			},
+		},
+		Subcommands: nil,
+	}
 }
+
 func (cmd *TicketCreateCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
 	channel, err := sess.GuildChannelCreateComplex(
 		msg.GuildID,
@@ -55,6 +64,7 @@ func (cmd *TicketCreateCmd) Run(sess *discordgo.Session, msg *discordgo.Message)
 			},
 		},
 	)
+
 	sess.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("The ticket has been created by user %s and channel name <#%s>", msg.Author.Username, channel.ID))
 	return err
 }

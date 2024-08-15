@@ -6,9 +6,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var TicketSubCommands = map[string]Command{
-	// "create": &TicketCreateCmd{},
-	// "close":  &TicketCloseCmd{},
+var ticketSubCommands = map[string]Command{
+	"create": &TicketCreateCmd{},
+	"close":  &TicketCloseCmd{},
 }
 
 type TicketCmd struct {
@@ -16,41 +16,42 @@ type TicketCmd struct {
 }
 
 func (cmd *TicketCmd) FromArgs(args []string) error {
-	if subCmd, ok := TicketSubCommands[args[0]]; ok {
-		subCmd.FromArgs(args[1:])
+	if subCmd, ok := ticketSubCommands[args[0]]; ok {
+		if err := subCmd.FromArgs(args[1:]); err != nil {
+			return err
+		}
+
 		cmd.Runner = func(sess *discordgo.Session, msg *discordgo.Message) {
 			subCmd.Run(sess, msg)
 		}
+
+		return nil
+	} else {
+		return errors.New("invalid args")
 	}
-	return nil
 }
 
 func (cmd *TicketCmd) Name() string { return "ticket" }
 func (cmd *TicketCmd) Help() string { return "Create or Closes a ticket for user" }
 func (cmd *TicketCmd) LongHelp() LongHelp {
 
-	// arguments := `* **@user** (Required): Mention the user to ban using the "@" symbol followed by their username.` + "\n" +
-	// 	`* **[days]** (Required): Specify the duration of the ban in days. If omitted, the ban will be permanent.` + "\n" +
-	// 	`* **[reason]** (Required): Provide a reason for the ban. The reason will be DM to user.`
-
 	return LongHelp{
-		About:       "This command bans a given user for specific days from the server.",
-		Usage:       "`!ban @user [days] [reason]`",
+		About:       "This command is used for managing tickets",
+		Usage:       "`!ticket <subcommand>`",
 		Arguments:   nil,
-		Subcommands: nil,
+		Subcommands: []string{"create", "close"},
 	}
-
 }
+
 func (cmd *TicketCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
 	if cmd.Runner != nil {
 		cmd.Runner(sess, msg)
-	} else {
-		return errors.New("invalid command format \n Usage: !ticket create <reason> or !ticket close")
 	}
+
 	cmd.Runner = nil
 	return nil
 }
 
 func (cmd *TicketCmd) Subcommands() map[string]Command {
-	return TicketSubCommands
+	return ticketSubCommands
 }

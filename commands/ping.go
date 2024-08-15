@@ -13,7 +13,7 @@ type PingCmd struct {
 
 func (cmd *PingCmd) FromArgs(args []string) error {
 	if len(args) != 0 {
-		return errors.New("invalid command \n Usage: !ping")
+		return errors.New("invalid args")
 
 	}
 	return nil

@@ -9,8 +9,8 @@ import (
 type NukeCmd struct{}
 
 func (cmd *NukeCmd) FromArgs(args []string) error {
-	if len(args) > 0 {
-		return errors.New("invalid command \n Usage: !nuke")
+	if len(args) != 0 {
+		return errors.New("invalid args")
 	}
 
 	return nil
@@ -32,7 +32,6 @@ func (cmd *NukeCmd) LongHelp() LongHelp {
 }
 
 func (cmd *NukeCmd) Run(sess *discordgo.Session, msg *discordgo.Message) error {
-
 	channel, err := sess.Channel(msg.ChannelID)
 	if err != nil {
 		return err
